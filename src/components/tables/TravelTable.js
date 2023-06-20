@@ -19,6 +19,18 @@ export default function StoreTravel(props) {
             let travels = res.data
             travels.map(async (travel)=>{
                 travel.statusName = travel.status === 0 ? 'Waiting for permission' : travel.status === 1 ? 'Accepted' : travel.status === 2 ? 'Travel completed successfully' : travel.status === 3 ? 'Travel is suspicious' : 'Denied'
+                if (travel.resultData[0]?.receiptPrice) {
+                    if (travel.resultData[0]?.receiptPrice.includes(',')) {
+                        travel.resultData[0].receiptPrice = parseInt((travel.resultData[0]?.receiptPrice.split(','))[0])
+                      }
+                      else if (travel.resultData[0]?.receiptPrice.includes('.')) {
+                        travel.resultData[0].receiptPrice = parseInt((travel.resultData[0]?.receiptPrice.split('.'))[0]) // 127.40 - 127
+                      }
+                      else {
+                        travel.resultData[0].receiptPrice = parseInt(travel.resultData[0]?.receiptPrice)
+                      }
+                }
+                
             })
             travels.sort(function(a, b) {
                 var keyA = new Date(a.createdAt),
@@ -101,6 +113,16 @@ export default function StoreTravel(props) {
             {
                 accessor: 'statusName',
                 title: 'Status',
+                textAlignment: 'center'
+            },
+            {
+                accessor: 'resultData[0].estimatedPrice',
+                title: 'Estimated Price',
+                textAlignment: 'center'
+            },
+            {
+                accessor: 'resultData[0].receiptPrice',
+                title: 'OCR Price',
                 textAlignment: 'center'
             },
             {
